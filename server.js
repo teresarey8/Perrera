@@ -72,8 +72,94 @@ app.delete("/items/:id", (req, res) => {
         .catch(err => res.status(500).send("error"))
 
 });
+// Ruta para subir archivos
+app.post('/subir', upload.single('file'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ message: 'No se ha subido ningún archivo' });
+    }
+    res.json({ message: 'Archivo subido correctamente', file: req.file });
+});
+
+app.get('/usuarios', (req, res) => {
+    User.find()
+        .then(users => res.json(users))
+        .catch(error => res.status(500).json({ mensaje: Err }))
+
+}
+)
+
+app.get('/usuario/:id', (req, res) => {
+    const id = req.params.id;
+    User.findById(id)
+        .then(user => res.render('usuario', { user }))
+        .catch(error => res.status(500).json({ mensaje: Err }))
+
+}
+
+
+)
+
+
+//registro de usuario
+app.post('/registro', upload.single('foto'), (req, res) => {
+    const { name, email, password } = req.body;
+
+    // Encriptar contraseña
+    bcrypt.genSalt(10)
+        .then(salt => bcrypt.hash(password, salt))
+        .then(hashedPassword => {
+            // Crear usuario
+            const newUser = new User({
+                name,
+                email,
+                password: hashedPassword,
+                foto: req.file.filename
+            });
+
+
+            // Guardar usuario
+            return newUser.save();
+        })
+        .then(() => {
+            res.json({ message: 'Usuario registrado correctamente' });
+        })
+        .catch(error => {
+            console.error(error);
+            res.status(500).json({ message: 'Error al registrar usuario' });
+        });
+});
+
+app.post('/login', (req, res) => {
+    const { email, password } = req.body;
+
+
+    // Buscar usuario
+    User.findOne({ email })
+        .then(user => {
+            if (!user) {
+                return res.status(400).json({ message: 'Credenciales inválidas' });
+            }
+
+
+            // Comparar contraseñas
+            return bcrypt.compare(password, user.password)
+                .then(isMatch => {
+                    if (!isMatch) {
+                        return res.status(400).json({ message: 'Credenciales inválidas' });
+                    }
+
+
+                    res.json({ message: 'Usuario autenticado correctamente' });
+                });
+        })
+        .catch(error => {
+            console.error(error);
+            res.status(500).json({ message: 'Error al iniciar sesión' });
+        });
+});
+
 // Iniciar el servidor
 app.listen(port, () => {
     console.log(`Servidor escuchando en http://localhost:${port}`);
-  });
+});
 

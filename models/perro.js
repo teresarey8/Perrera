@@ -22,7 +22,7 @@ const buscaTodos = () => {
             throw err;
         });
 }
-const crearNuevoPerro = (perro) => {
+const crearNuevoPerro = (n,e,r,c) => {
     const nuevoPerro = new Perro({
         nombre: n,
         edad: e,
@@ -68,4 +68,4 @@ const borrarPerro = (idPerroParaBorrar) => {
             throw err;
         });
 }
-module.exports = {borrarPerro, actualizarPerro, crearNuevoPerro, Perro}
+module.exports = {buscaTodos, borrarPerro, actualizarPerro, crearNuevoPerro, Perro}
