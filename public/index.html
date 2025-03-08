@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Listado de ordenadores</h1>
+    <a href="/registro.html">Registro nuevo usuario</a>
+    <a href="/insertar.html">Nuevo perro</a>
+    <a href="/actualiza.html">Actualizar perro</a>
+    <table id="tablaProducto">
+        <thead>
+            <tr>
+                <th>id</th><th>nombre</th><th>edad</th>><th>raza</th>><th>color</th>               
+            </tr>
+        </thead>
+        <tbody id="cuerpo-tabla">
+
+        </tbody>
+    </table>
+    <script>
+        fetch('/items')
+        .then(response =>response.json())
+        .then(perro=>{
+            
+            console.log(perros);
+            for ( perro of perros){
+                fila = document.createElement('tr');
+                fila.id = perro._id;
+                fila.innerHTML = `<td>${perro._id}</td>
+                <td>${perro.nombre}</td>
+                <td>${perro.edad}</td>
+                <td>${perro.raza}</td>
+                <td>${perro.color}</td>
+
+                <td><button onclick=eliminaPerro('${perro._id}')>Borrar perro</button></td>
+                <td><button onclick=actualizaPerro('${perro._id}')>Actualizar perro</button></td>`
+                
+                ;
+                
+                document.getElementById('cuerpo-tabla').appendChild(fila);
+            }
+           
+        })
+     function actualizaPerro(id) {
+            window.location.href = `/update_perro?id=${id}`;
+    }
+        function eliminaPerro(id){
+            if (confirm("¿Está seguro/a?")){
+                fetch('/items/'+id,{
+                    method:'DELETE'   
+                }).
+                then(response=>{
+                    if (  esponse.ok ) {
+                        document.getElementById(id).remove();
+                        alert("perro eliminado");
+
+                    }
+                    else
+                    {
+                        alert("ERROR al eliminar")
+                    }
+
+                })
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<h1>Insertar Perro</h1>
+<p>nombre: <input type="text" name="nombre" id="nombre"></p>
+<p>edad: <input type="number" name="edad" id="edad"></p>
+<p>raza: <input type="text" name="raza" id="raza"></p>
+<p>color: <input type="text" name="color" id="color"></p>
+
+<button id="btn-insertar">Insertar</button>
+
+<script>
+    const insertPerro = ()=>{
+        let nombre = document.getElementById('nombre').value;
+        let edad = document.getElementById('edad').value;
+        let raza = document.getElementById('raza').value;
+        let color = document.getElementById('color').value;
+
+        fetch('/items',{
+            method: 'POST',
+            headers: {
+                'Content-Type' : 'application/JSON'
+            },
+            body: JSON.stringify({nombre, edad, raza, color})
+        }).then(
+            perro=>{
+                if ( perro ) {
+                    alert("Perro insertado")
+                } else {
+                    alert("No se insertó el perro")
+                }
+            }
+
+        )
+        .catch(err=>{
+            alert(err);
+        })
+    }
+
+    document.getElementById("btn-insertar").addEventListener('click',insertPerro)
+
+</script>
+</body>
+</html>

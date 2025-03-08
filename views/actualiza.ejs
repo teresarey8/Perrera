@@ -6,14 +6,20 @@
     <title>Actualizar Perro</title>
 </head>
 <body>
-    <h1>Actualizar Ordenador</h1>
+    <h1>Actualizar Perro</h1>
     <form id="updateForm">
-        <input type="hidden" name="id" value="<%= ordenador._id %>">
-        <label for="marca">Marca:</label>
-        <input type="text" id="marca" name="marca" value="<%= ordenador.marca %>">
+        <input type="hidden" name="id" value="<%= perro._id %>">
+        <label for="nombre">nombre:</label>
+        <input type="text" id="nombre" name="nombre" value="<%= perro.nombre %>">
         <br>
-        <label for="precio">Precio:</label>
-        <input type="text" id="precio" name="precio" value="<%= ordenador.precio %>">
+        <label for="edad">edad:</label>
+        <input type="text" id="edad" name="edad" value="<%= perro.edad %>">
+        <br>
+        <label for="raza">raza:</label>
+        <input type="text" id="raza" name="raza" value="<%= perro.raza %>">
+        <br>
+        <label for="color">color:</label>
+        <input type="text" id="color" name="color" value="<%= perro.color %>">
         <br>
         <button type="submit">Actualizar</button>
     </form>
@@ -22,26 +28,29 @@
         document.getElementById('updateForm').addEventListener('submit', function(event) {
             event.preventDefault();
             const id = document.querySelector('input[name="id"]').value;
-            const marca = document.querySelector('input[name="marca"]').value;
-            const precio = document.querySelector('input[name="precio"]').value;
+            const nombre = document.querySelector('input[name="nombre"]').value;
+            const edad = document.querySelector('input[name="edad"]').value;
+            const raza = document.querySelector('input[name="raza"]').value;
+            const color = document.querySelector('input[name="color"]').value;
+
 
             fetch(`/items/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ marca, precio })
+                body: JSON.stringify({ nombre, edad, raza, color})
             })
             .then(response => {
                 if (response.ok) {
                     window.location.href = '/';
                 } else {
-                    alert('Error al actualizar el ordenador');
+                    alert('Error al actualizar el perro');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error al actualizar el ordenador');
+                alert('Error al actualizar el perro');
             });
         });
     </script>

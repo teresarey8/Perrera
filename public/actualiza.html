@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #id {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Lista perros</h1>
+    <a href="/actualiza.html">Actualizar perros</a>
+    <select name="seleccionaPerro" id="seleccionaPerro">
+
+    </select>
+    <script>
+
+        const creaSelect = () => {
+            fetch('/items')
+                .then(response => response.json())
+                .then(
+                    perros => {
+                        const selectPerr = document.getElementById("seleccionaPerro");
+                        while (selectPerr.firstChild) {
+                            selectPerr.removeChild(selectPerr.firstChild);
+                        }
+
+                        for (perro of perros) {
+                            let opcion = document.createElement('option');
+                            opcion.value = perro._id;
+                            opcion.innerHTML = perro.nombre + '-' + perro.edad + '-' + perro.raza + '-' + perro.color;
+                            document.getElementById("seleccionaPerro").appendChild(opcion)
+                        }
+                    }
+                ).catch(err => alert(err))
+
+        }
+
+
+
+        const traePerro = () => {
+            id = document.getElementById("seleccionaPerro").value;
+            fetch('/items/' + id)
+                .then(response => response.json())
+                .then(perro => {
+                    document.getElementById('id').value = perro._id;
+                    document.getElementById('nombre').value = perro.nombre;
+                    document.getElementById('edad').value = perro.edad;
+                    document.getElementById('raza').value = perro.raza;
+                    document.getElementById('color').value = perro.color;
+                })
+        }
+
+        const actualizaPerro = () => {
+            let nombre = document.getElementById('nombre').value;
+            let raza = document.getElementById('raza').value;
+            let color = document.getElementById('color').value;
+            let edad = Number(document.getElementById('edad').value);
+            let id = document.getElementById("seleccionaPerro").value;
+            fetch('/items/' + id, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/JSON'
+                },
+                body: JSON.stringify({ nombre, edad, raza, color })
+            }).then(
+                perro => {
+                    if (perro) {
+                        creaSelect();
+                        alert("perro ACTUALIZADO")
+                    } else {
+                        alert("No se insertó el perro")
+                    }
+                }
+
+            )
+                .catch(err => {
+                    alert(err);
+                })
+
+
+        }
+        document.getElementById("seleccionaPerro").addEventListener('change', traePerro);
+        creaSelect();
+        traePerro();
+    </script>
+    <input type="text" name="id" id="id">
+    <p>nombre: <input type="text" name="nombre" id="nombre"></p>
+    <p>edad: <input type="number" name="edad" id="edad"></p>
+    <p>raza: <input type="text" name="raza" id="raza"></p>
+    <p>color: <input type="text" name="color" id="color"></p>
+
+    <button id="btn-insertar" onclick="actualizaPerro()">Actualiza</button>
+
+
+</body>
+
+</html>
