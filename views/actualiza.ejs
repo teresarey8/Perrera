@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizar Perro</title>
+</head>
+<body>
+    <h1>Actualizar Ordenador</h1>
+    <form id="updateForm">
+        <input type="hidden" name="id" value="<%= ordenador._id %>">
+        <label for="marca">Marca:</label>
+        <input type="text" id="marca" name="marca" value="<%= ordenador.marca %>">
+        <br>
+        <label for="precio">Precio:</label>
+        <input type="text" id="precio" name="precio" value="<%= ordenador.precio %>">
+        <br>
+        <button type="submit">Actualizar</button>
+    </form>
+
+    <script>
+        document.getElementById('updateForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const id = document.querySelector('input[name="id"]').value;
+            const marca = document.querySelector('input[name="marca"]').value;
+            const precio = document.querySelector('input[name="precio"]').value;
+
+            fetch(`/items/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ marca, precio })
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/';
+                } else {
+                    alert('Error al actualizar el ordenador');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al actualizar el ordenador');
+            });
+        });
+    </script>
+</body>
+</html>
