@@ -20,6 +20,11 @@ app.set('views', './views');
 const modeloPerro = require('./models/perro');
 const User = require("./models/User");
 
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/public/login.html');
+});
+
+
 app.get('/update_perro', (req, res) => {
     const id = req.query.id;
     console.log("ID recibido en el backend:", id);
@@ -161,6 +166,7 @@ app.post('/registro', upload.single('foto'), (req, res) => {
         })
         .then(() => {
             res.json({ message: 'Usuario registrado correctamente' });
+            window.location.href('/public/login.html')
         })
         .catch(error => {
             console.error(error);
