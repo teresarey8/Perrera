@@ -10,7 +10,8 @@ const Perro = mongoose.model('Perro', perroSchema, 'perros');
 const buscaTodos = () => {
     return Perro.find()
         .then(perros => {
-            if (perros.lenght > 0) {
+            if (perros.length > 0) {
+                console.log('Perros encontrados', perros)
                 return perros;
             } else {
                 console.log('No se encontró ningún registro');
@@ -22,7 +23,23 @@ const buscaTodos = () => {
             throw err;
         });
 }
-const crearNuevoPerro = (n,e,r,c) => {
+const buscaPorId = (id) => {
+    //buscamos el primer registro
+    return Perro.findById(id)
+        .then(perro => {
+            if (perro) {
+                return perro;
+            } else {
+                console.log('No se encontró ningún registro con el id' + id);
+                return null;
+            }
+        })
+        .catch(err => {
+            console.error('Error al obtener el perro' + id, err);
+            throw err;
+        });
+}
+const crearNuevoPerro = (n, e, r, c) => {
     const nuevoPerro = new Perro({
         nombre: n,
         edad: e,
@@ -53,7 +70,7 @@ const actualizarPerro = (idPerro, perroActualizar) => {
         .catch(err => console.error('Error al actualizar el ordenador:', err));
 }
 const borrarPerro = (idPerroParaBorrar) => {
-    return Perro.findByidAndDelete(idPerroParaBorrar)
+    return Perro.findByIdAndDelete(idPerroParaBorrar)
         .then(perroEliminado => {
             if (perroEliminado) {
                 console.log('Perro eliminado: ', perroEliminado)
@@ -68,4 +85,4 @@ const borrarPerro = (idPerroParaBorrar) => {
             throw err;
         });
 }
-module.exports = {buscaTodos, borrarPerro, actualizarPerro, crearNuevoPerro, Perro}
+module.exports = { buscaPorId, buscaTodos, borrarPerro, actualizarPerro, crearNuevoPerro, Perro }

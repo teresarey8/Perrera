@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const multer = require('multer')
 const upload = multer({ dest: 'uploads/' })
 const app = express();
-const port = 3004;
+const port = 3003;
 
 require('dotenv').config();
 
@@ -19,6 +19,49 @@ app.set('view engine', 'ejs');
 app.set('views', './views');
 const modeloPerro = require('./models/perro');
 const User = require("./models/User");
+
+app.get('/update_perro', (req, res) => {
+    const id = req.query.id;
+    console.log("ID recibido en el backend:", id);
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        console.log("ID no válido en MongoDB");
+        return res.status(400).send("ID no válido");
+    }
+
+    modeloPerro.buscaPorId(id)
+        .then(perro => {
+            if (!perro) {
+                console.log("Perro no encontrado en la base de datos");
+                return res.status(404).send("Perro no encontrado");
+            }
+            res.render('actualiza', { perro });
+        })
+        .catch(err => {
+            console.error("Error al buscar el perro:", err);
+            res.status(500).send("Error al encontrar el perro");
+        });
+});
+
+
+
+app.post('/update_perro', (req, res) => {
+    const { id, nombre, edad, raza, color } = req.body;
+    modeloPerro.buscaPorId(id).then(perro => {
+        if (perro) {
+            perro.nombre = nombre;
+            perro.edad = edad;
+            perro.raza = raza;
+            perro.color = color;
+            perro.save()
+                .then(perro => res.redirect('/'))
+                .catch(err => res.status(500).send("error 1 "))
+        } else {
+            res.status(404).send('Perro no encontrado');
+        }
+    });
+});
+
 
 // Obtener todos los ítems
 app.get("/items", (req, res) => {
@@ -94,11 +137,7 @@ app.get('/usuario/:id', (req, res) => {
         .then(user => res.render('usuario', { user }))
         .catch(error => res.status(500).json({ mensaje: Err }))
 
-}
-
-
-)
-
+})
 
 //registro de usuario
 app.post('/registro', upload.single('foto'), (req, res) => {
@@ -129,34 +168,34 @@ app.post('/registro', upload.single('foto'), (req, res) => {
         });
 });
 
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
+    if (!email || !password) {
+        return res.status(400).json({ message: 'Faltan credenciales' });
+    }
 
-    // Buscar usuario
-    User.findOne({ email })
-        .then(user => {
-            if (!user) {
-                return res.status(400).json({ message: 'Credenciales inválidas' });
-            }
+    try {
+        // Buscar usuario
+        const user = await User.findOne({ email });
+        if (!user || !user.password) {
+            return res.status(400).json({ message: 'Credenciales inválidas' });
+        }
 
+        // Comparar contraseñas
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Credenciales inválidas' });
+        }
 
-            // Comparar contraseñas
-            return bcrypt.compare(password, user.password)
-                .then(isMatch => {
-                    if (!isMatch) {
-                        return res.status(400).json({ message: 'Credenciales inválidas' });
-                    }
+        res.json({ message: 'Usuario autenticado correctamente' });
 
-
-                    res.json({ message: 'Usuario autenticado correctamente' });
-                });
-        })
-        .catch(error => {
-            console.error(error);
-            res.status(500).json({ message: 'Error al iniciar sesión' });
-        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al iniciar sesión' });
+    }
 });
+
 
 // Iniciar el servidor
 app.listen(port, () => {
