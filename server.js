@@ -144,34 +144,28 @@ app.get('/usuario/:id', (req, res) => {
 
 })
 
-//registro de usuario
-app.post('/registro', upload.single('foto'), (req, res) => {
-    const { name, email, password } = req.body;
+app.post('/registro', async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
 
-    // Encriptar contraseña
-    bcrypt.genSalt(10)
-        .then(salt => bcrypt.hash(password, salt))
-        .then(hashedPassword => {
-            // Crear usuario
-            const newUser = new User({
-                name,
-                email,
-                password: hashedPassword,
-                foto: req.file.filename
-            });
+        // Verificar si el usuario ya existe
+        const existingUser = await User.findOne({ email });
+        if (existingUser) return res.status(400).json({ message: "El usuario ya existe" });
 
+        // Hashear la contraseña
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
-            // Guardar usuario
-            return newUser.save();
-        })
-        .then(() => {
-            res.json({ message: 'Usuario registrado correctamente' });
-            window.location.href('/public/login.html')
-        })
-        .catch(error => {
-            console.error(error);
-            res.status(500).json({ message: 'Error al registrar usuario' });
-        });
+        // Crear usuario y guardar en la BD
+        const newUser = new User({ name, email, password: hashedPassword });
+        await newUser.save();
+
+        res.json({ message: "Usuario registrado correctamente" });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error al registrar usuario" });
+    }
 });
 
 app.post('/login', async (req, res) => {

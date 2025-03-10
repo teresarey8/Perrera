@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Usuario</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
 <body class="container mt-5">
     <h1 class="text-center mb-4">Registro de Usuario</h1>
 
@@ -25,14 +22,46 @@
             <label for="password" class="form-label">Contraseña:</label>
             <input type="password" class="form-control" id="password" name="password" required>
         </div>
-        <div class="mb-3">
-            <label for="foto" class="form-label">Subir Foto:</label>
-            <input type="file" class="form-control" id="foto" name="foto" accept="image/*" required>
-        </div>
-        <button type="submit" class="btn btn-primary" id="submitBtn">Registrar</button>
+
+        <button type="submit" class="btn btn-primary">Registrar</button>
     </form>
 
-    <script src="js/subirfoto.js"></script>
-</body>
+    <div id="registroNotificacion" class="alert" hidden></div>
 
+    <script>
+        document.getElementById("registrationForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            await crearElementoAsync();
+        });
+
+        async function crearElementoAsync() {
+            const notificacion = document.getElementById("registroNotificacion");
+            try {
+                const nuevoRegistro = {
+                    name: document.getElementById("name").value,
+                    email: document.getElementById("email").value,
+                    password: document.getElementById("password").value,
+                };
+
+                const response = await fetch('/registro', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(nuevoRegistro),
+                });
+
+                if (!response.ok) throw new Error("Error en el registro");
+
+                notificacion.hidden = false;
+                notificacion.className = "alert alert-success mt-3";
+                notificacion.innerHTML = "Usuario registrado correctamente. Redirigiendo...";
+
+                setTimeout(() => location.href = "index1.html", 3000);
+            } catch (error) {
+                notificacion.hidden = false;
+                notificacion.className = "alert alert-danger mt-3";
+                notificacion.innerHTML = "Hubo un error al registrar. Inténtelo de nuevo.";
+            }
+        }
+    </script>
+</body>
 </html>
